@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_fragments"
-    app:startDestination="@id/gameFragment">
+    app:startDestination="@id/welcomeFragment">
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.example.juegodecolores.GameFragment"
