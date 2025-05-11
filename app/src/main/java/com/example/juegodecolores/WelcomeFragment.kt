@@ -8,6 +8,7 @@ import android.view.animation.Animation
 import android.widget.Button
 import android.view.animation.AnimationUtils
 import androidx.navigation.fragment.findNavController
+import android.content.pm.ActivityInfo
 
 class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
     private var mediaPlayer: MediaPlayer? = null
@@ -36,5 +37,15 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
         super.onDestroyView()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 }
