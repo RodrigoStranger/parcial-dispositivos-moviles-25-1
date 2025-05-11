@@ -3,17 +3,14 @@
     <string name="timer_start">00:30</string>
     <string name="countdown_start">3</string>
     <string name="score_start">Puntuación: 0</string>
-    <!-- nombre de la app -->
     <string name="app_name">Juego de colores</string>
-
-    <!-- Recursos de WelcomeFragment -->
     <string name="titulo_juego">Juego de Colores</string>
     <string name="iniciar_juego">Comenzar Juego</string>
     <string name="descripcion_juego">El juego consiste en presionar el botón que coincida con el color que aparece en la pantalla</string>
-
-
-
-
     <string name="timer_icon">Icono de temporizador</string>
     <string name="button_click">Click</string>
+    <string name="game_image_desc">Imagen del juego</string>
+    <string name="color_name">Nombre color</string>
+    <string name="adivinar_color">Adivina el color:</string>
+
 </resources>
