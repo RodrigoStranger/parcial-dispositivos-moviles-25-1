@@ -46,10 +46,12 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        mediaPlayer?.start()
     }
 
     override fun onPause() {
         super.onPause()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        mediaPlayer?.pause()
     }
 }
