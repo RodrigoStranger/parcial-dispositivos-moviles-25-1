@@ -2,6 +2,7 @@
     <string name="timer_zero">00:00</string>
     <string name="timer_start">00:30</string>
     <string name="countdown_start">3</string>
+    <string name="score_start">Puntuación: 0</string>
     <!-- nombre de la app -->
     <string name="app_name">Juego de colores</string>
 
