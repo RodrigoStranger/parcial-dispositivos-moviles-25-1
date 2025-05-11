@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/textViewResult"
-        android:layout_width="172dp"
+        android:layout_width="wrap_content"
         android:layout_height="41dp"
         android:background="@drawable/bg_back"
         android:fontFamily="sans-serif-black"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/VolverAJugarButton"
+        android:id="@+id/volverAJugarButton"
         android:layout_width="171dp"
         android:layout_height="67dp"
         android:layout_marginBottom="128dp"
