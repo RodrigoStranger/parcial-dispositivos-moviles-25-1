@@ -95,6 +95,11 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 1000L,
                 timerText,
                 onTickCallback = { secondsLeft ->
+                    if (secondsLeft <= 5) {
+                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
+                    } else {
+                        timerText.setTextColor(requireContext().getColor(R.color.white))
+                    }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
                         warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
