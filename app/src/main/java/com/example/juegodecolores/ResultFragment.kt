@@ -17,6 +17,12 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
         val puntuacionPlayer = android.media.MediaPlayer.create(requireContext(), R.raw.sonido_puntuacion)
         puntuacionPlayer.setOnCompletionListener { it.release() }
         puntuacionPlayer.start()
+        // Animación bounce para los botones
+        val bounce = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
+        val volverMenu = view.findViewById<android.widget.Button>(R.id.volverMenuInicioButton)
+        val volverJugar = view.findViewById<android.widget.Button>(R.id.volverAJugarButton)
+        volverMenu.setOnClickListener { it.startAnimation(bounce) }
+        volverJugar.setOnClickListener { it.startAnimation(bounce) }
         // Bloquear botón back
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
