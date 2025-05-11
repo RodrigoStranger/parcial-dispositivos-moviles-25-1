@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import android.media.MediaPlayer
 import android.os.Looper
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var countdownPlayer: MediaPlayer? = null
@@ -21,6 +22,63 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var backgroundPlayer: MediaPlayer? = null
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
+    // --- Lógica de colores ---
+    data class ColorOption(val name: String, val colorRes: Int)
+
+    private val colorOptions = listOf(
+        ColorOption("Rojo", R.color.rojo),
+        ColorOption("Violeta", R.color.violeta),
+        ColorOption("Naranja", R.color.naranja),
+        ColorOption("Verde", R.color.verde),
+        ColorOption("Azul", R.color.azul),
+        ColorOption("Rosado", R.color.rosado),
+        ColorOption("Amarillo", R.color.amarillo),
+        ColorOption("Marrón", R.color.marron),
+        ColorOption("Negro", R.color.negro),
+        ColorOption("Blanco", R.color.blanco)
+    )
+    private var currentColors: List<ColorOption> = emptyList()
+    private var targetColor: ColorOption? = null
+    private var score = 0
+    private var gameActive = false
+
+    private fun iniciarNuevaRonda() {
+        if (!gameActive) return
+        // Selecciona 4 colores distintos
+        currentColors = colorOptions.shuffled().take(4)
+        // Selecciona uno de esos como objetivo
+        targetColor = currentColors.random()
+        // Asigna colores a los botones
+        val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+        for (i in 0..3) {
+            val btn = view?.findViewById<Button>(buttonIds[i])
+            btn?.setBackgroundTintList(android.content.res.ColorStateList.valueOf(requireContext().getColor(currentColors[i].colorRes)))
+            btn?.tag = currentColors[i].name // Guarda el nombre del color en el tag
+        }
+        // Muestra el nombre del color objetivo
+        val colorNameText = view?.findViewById<TextView>(R.id.color_dynamic_text)
+        colorNameText?.text = targetColor?.name
+    }
+
+    private fun mostrarResultado(acierto: Boolean) {
+        val imageView = view?.findViewById<ImageView>(R.id.game_image)
+        val mediaPlayer = if (acierto) {
+            imageView?.setImageResource(R.drawable.bien) // bien.png
+            MediaPlayer.create(requireContext(), R.raw.sonido_correcto)
+        } else {
+            imageView?.setImageResource(R.drawable.error) // mal.png
+            MediaPlayer.create(requireContext(), R.raw.sonido_error)
+        }
+        imageView?.visibility = View.VISIBLE
+        mediaPlayer.setOnCompletionListener {
+            imageView?.visibility = View.INVISIBLE
+            mediaPlayer.release()
+            // Siguiente ronda si el juego sigue activo
+            if (gameActive) iniciarNuevaRonda()
+        }
+        mediaPlayer.start()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -47,21 +105,26 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val scoreText = view.findViewById<TextView>(R.id.score_text)
         scoreText.visibility = View.INVISIBLE
 
-        button1.setOnClickListener { v ->
-            v.startAnimation(bounce)
-            // Lógica adicional para el botón 1
-        }
-        button2.setOnClickListener { v ->
-            v.startAnimation(bounce)
-            // Lógica adicional para el botón 2
-        }
-        button3.setOnClickListener { v ->
-            v.startAnimation(bounce)
-            // Lógica adicional para el botón 3
-        }
-        button4.setOnClickListener { v ->
-            v.startAnimation(bounce)
-            // Lógica adicional para el botón 4
+        val imageView = view.findViewById<ImageView>(R.id.game_image)
+        val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+        val buttons = buttonIds.map { view.findViewById<Button>(it) }
+
+        buttons.forEach { btn ->
+            btn.setOnClickListener { v ->
+                v.startAnimation(bounce)
+                if (!gameActive) return@setOnClickListener
+                val elegido = btn.tag as? String
+                val correcto = targetColor?.name
+                if (elegido != null && correcto != null) {
+                    if (elegido == correcto) {
+                        score++
+                        scoreText.text = "Puntuación: $score"
+                        mostrarResultado(true)
+                    } else {
+                        mostrarResultado(false)
+                    }
+                }
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
@@ -121,6 +184,11 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             // Muestra la puntuación ahora
             val scoreText = view?.findViewById<TextView>(R.id.score_text)
             scoreText?.visibility = View.VISIBLE
+            // Activa el juego y resetea la puntuación
+            gameActive = true
+            score = 0
+            scoreText?.text = "Puntuación: 0"
+            iniciarNuevaRonda()
             // Inicia el temporizador
             var warningPlayed = false
             val gameTimer = GameCountDownTimer(
@@ -146,6 +214,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp -> mp.release() }
                     finishedPlayer?.start()
+                    // Desactiva el juego
+                    gameActive = false
                 }
             )
             gameTimer.start()
