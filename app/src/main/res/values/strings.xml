@@ -15,4 +15,5 @@
 
 
     <string name="timer_icon">Icono de temporizador</string>
+    <string name="button_click">Click</string>
 </resources>

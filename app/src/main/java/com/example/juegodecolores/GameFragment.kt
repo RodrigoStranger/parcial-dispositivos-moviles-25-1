@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.TextView
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import android.media.MediaPlayer
 import android.os.Looper
+import android.view.animation.AnimationUtils
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var backgroundPlayer: MediaPlayer? = null
@@ -15,6 +17,30 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Animación bounce para los 4 botones
+        val bounce = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
+        val button1 = view.findViewById<Button>(R.id.button1)
+        val button2 = view.findViewById<Button>(R.id.button2)
+        val button3 = view.findViewById<Button>(R.id.button3)
+        val button4 = view.findViewById<Button>(R.id.button4)
+
+        button1.setOnClickListener { v ->
+            v.startAnimation(bounce)
+            // Lógica adicional para el botón 1
+        }
+        button2.setOnClickListener { v ->
+            v.startAnimation(bounce)
+            // Lógica adicional para el botón 2
+        }
+        button3.setOnClickListener { v ->
+            v.startAnimation(bounce)
+            // Lógica adicional para el botón 3
+        }
+        button4.setOnClickListener { v ->
+            v.startAnimation(bounce)
+            // Lógica adicional para el botón 4
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
