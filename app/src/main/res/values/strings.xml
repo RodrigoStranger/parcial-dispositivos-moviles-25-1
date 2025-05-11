@@ -13,4 +13,7 @@
     <string name="color_name">Nombre color</string>
     <string name="adivinar_color">Adivina el color:</string>
     <string name="score_text">Puntuación: %1$d</string>
+    <string name="resultado_text">Puntos: %1$d</string>
+    <string name="volver_a_jugar">Volver a jugar</string>
+    <string name="volver_menu_inicio">Volver al inicio</string>
 </resources>
