@@ -219,6 +219,11 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     finishedPlayer?.start()
                     // Desactiva el juego
                     gameActive = false
+                    // Deshabilita todos los botones
+                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+                    buttonIds.forEach { id ->
+                        view?.findViewById<Button>(id)?.isEnabled = false
+                    }
                 }
             )
             gameTimer.start()
