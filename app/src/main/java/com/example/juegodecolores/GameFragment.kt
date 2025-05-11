@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
-import com.example.juegodecolores.GameCountDownTimer
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
