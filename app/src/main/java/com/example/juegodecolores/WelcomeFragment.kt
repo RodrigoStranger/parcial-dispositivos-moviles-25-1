@@ -26,16 +26,7 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
                 override fun onAnimationStart(animation: Animation?) {}
                 override fun onAnimationRepeat(animation: Animation?) {}
                 override fun onAnimationEnd(animation: Animation?) {
-                    requireActivity().supportFragmentManager.beginTransaction()
-    .setCustomAnimations(
-        R.anim.fade_in, // animación de entrada (GameFragment)
-        R.anim.fade_out, // animación de salida (WelcomeFragment)
-        R.anim.fade_in, // animación de entrada al volver (WelcomeFragment)
-        R.anim.fade_out // animación de salida al volver (GameFragment)
-    )
-    .replace(R.id.FragmentContainer, GameFragment())
-    .addToBackStack(null)
-    .commit()
+                    findNavController().navigate(R.id.action_welcomeFragment_to_gameFragment)
                 }
             })
         }
