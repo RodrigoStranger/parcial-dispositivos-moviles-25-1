@@ -106,7 +106,6 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val scoreText = view.findViewById<TextView>(R.id.score_text)
         scoreText.visibility = View.INVISIBLE
 
-        val imageView = view.findViewById<ImageView>(R.id.game_image)
         val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
         val buttons = buttonIds.map { view.findViewById<Button>(it) }
 
@@ -121,7 +120,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 if (elegido != null && correcto != null) {
                     if (elegido == correcto) {
                         score++
-                        scoreText.text = "Puntuación: $score"
+                        scoreText.text = getString(R.string.score_text, score)
                         mostrarResultado(true)
                     } else {
                         mostrarResultado(false)
@@ -190,7 +189,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             // Activa el juego y resetea la puntuación
             gameActive = true
             score = 0
-            scoreText?.text = "Puntuación: 0"
+            scoreText?.text = getString(R.string.score_text, 0)
             iniciarNuevaRonda()
             // Inicia el temporizador
             var warningPlayed = false
