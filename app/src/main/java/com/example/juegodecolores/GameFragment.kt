@@ -14,6 +14,7 @@ import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 
 class GameFragment : Fragment(R.layout.fragment_game) {
+    private var hasNavigated = false // Evita doble navegación
     private var countdownPlayer: MediaPlayer? = null
     private var countdownPosition: Int = 0
     private var countdownIndex: Int = 0
@@ -23,6 +24,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var backgroundPlayer: MediaPlayer? = null
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
+
     // --- Lógica de colores ---
     data class ColorOption(val name: String, val colorRes: Int)
 
@@ -53,7 +55,13 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
         for (i in 0..3) {
             val btn = view?.findViewById<Button>(buttonIds[i])
-            btn?.setBackgroundTintList(android.content.res.ColorStateList.valueOf(requireContext().getColor(currentColors[i].colorRes)))
+            btn?.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                    requireContext().getColor(
+                        currentColors[i].colorRes
+                    )
+                )
+            )
             btn?.tag = currentColors[i].name // Guarda el nombre del color en el tag
             btn?.isEnabled = true // Habilita el botón para la nueva ronda
         }
@@ -162,7 +170,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             countdownPosition = 0
             // Inicia la música de fondo (solo una vez)
             if (backgroundPlayer == null) {
-                backgroundPlayer = MediaPlayer.create(requireContext(), R.raw.musica_de_fondo_desarrollo_resumen)
+                backgroundPlayer =
+                    MediaPlayer.create(requireContext(), R.raw.musica_de_fondo_desarrollo_resumen)
                 backgroundPlayer?.isLooping = true
                 backgroundPlayer?.start()
             }
@@ -206,7 +215,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
-                        warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
+                        warningPlayer =
+                            MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
                         warningPlayer?.setOnCompletionListener { mp -> mp.release() }
                         warningPlayer?.start()
                         warningPlayed = true
@@ -215,7 +225,22 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 onFinishCallback = {
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
-                    finishedPlayer?.setOnCompletionListener { mp -> mp.release() }
+                    finishedPlayer?.setOnCompletionListener { mp ->
+                        mp.release()
+                        if (!hasNavigated && isAdded && view != null) {
+                            hasNavigated = true
+                            try {
+                                val bundle = Bundle()
+                                bundle.putInt("score", score)
+                                findNavController().navigate(
+                                    R.id.action_gameFragment_to_resultFragment,
+                                    bundle
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
                     finishedPlayer?.start()
                     // Desactiva el juego
                     gameActive = false
@@ -224,10 +249,6 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     buttonIds.forEach { id ->
                         view?.findViewById<Button>(id)?.isEnabled = false
                     }
-                    // Navega a ResultFragment pasando el puntaje
-                    val bundle = Bundle()
-                    bundle.putInt("score", score)
-                    findNavController().navigate(R.id.action_gameFragment_to_resultFragment, bundle)
                 }
             )
             gameTimer.start()
@@ -256,12 +277,13 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        backgroundPlayer?.release()
-        backgroundPlayer = null
+        // No liberar backgroundPlayer aquí, para que siga sonando en ResultFragment
         warningPlayer?.release()
         warningPlayer = null
+        finishedPlayer?.setOnCompletionListener(null)
         finishedPlayer?.release()
         finishedPlayer = null
+        hasNavigated = false // Reinicia flag al destruir vista
     }
 
     override fun onResume() {
@@ -276,17 +298,4 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             isCountdownPaused = false
         }
     }
-
-    override fun onPause() {
-        super.onPause()
-        backgroundPlayer?.pause()
-        warningPlayer?.pause()
-        finishedPlayer?.pause()
-        countdownPlayer?.pause()
-        countdownPosition = countdownPlayer?.currentPosition ?: 0
-        isCountdownPaused = true
-        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
-        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    }
-
 }

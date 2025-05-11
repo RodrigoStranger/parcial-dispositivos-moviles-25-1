@@ -13,6 +13,10 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
         // Muestra el puntaje en el TextView
         val textViewResult = view.findViewById<TextView>(R.id.textViewResult)
         textViewResult.text = getString(R.string.resultado_text, score)
+        // Reproduce el sonido de puntuación
+        val puntuacionPlayer = android.media.MediaPlayer.create(requireContext(), R.raw.sonido_puntuacion)
+        puntuacionPlayer.setOnCompletionListener { it.release() }
+        puntuacionPlayer.start()
         // Bloquear botón back
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
