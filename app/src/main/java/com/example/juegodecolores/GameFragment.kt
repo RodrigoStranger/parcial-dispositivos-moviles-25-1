@@ -21,7 +21,6 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var backgroundPlayer: MediaPlayer? = null
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
-    private var mediaPlayer: MediaPlayer? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
