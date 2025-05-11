@@ -1,5 +1,6 @@
 package com.example.juegodecolores
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -121,6 +122,16 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         warningPlayer = null
         finishedPlayer?.release()
         finishedPlayer = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
 }
