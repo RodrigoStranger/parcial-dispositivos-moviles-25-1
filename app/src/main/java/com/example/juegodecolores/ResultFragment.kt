@@ -47,6 +47,7 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
                 override fun onAnimationStart(animation: android.view.animation.Animation?) {}
                 override fun onAnimationRepeat(animation: android.view.animation.Animation?) {}
                 override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    (activity as? MainActivity)?.detenerMusicaFondo()
                     findNavController().popBackStack()
                 }
             })
@@ -72,11 +73,15 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
         super.onResume()
         // Bloquear rotación
         requireActivity().requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if (isVisible) {
+            (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_desarrollo_resumen)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         // Permitir rotación al salir
         requireActivity().requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        (activity as? MainActivity)?.detenerMusicaFondo()
     }
 }
