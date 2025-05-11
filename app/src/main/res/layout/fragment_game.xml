@@ -40,4 +40,19 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/countdown_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3"
+        android:textSize="60sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@android:color/transparent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

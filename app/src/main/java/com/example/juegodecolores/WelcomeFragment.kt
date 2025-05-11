@@ -22,6 +22,10 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
         val botonJugar = view.findViewById<Button>(R.id.iniciarJuegoButton)
         botonJugar.setOnClickListener {
             val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
+            // Detén la música de fondo inmediatamente
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
             botonJugar.startAnimation(anim)
             anim.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
