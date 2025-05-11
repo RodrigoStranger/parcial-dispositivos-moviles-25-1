@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.os.Handler
 import android.os.Looper
 import android.widget.TextView
+import com.example.juegodecolores.GameCountDownTimer
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,8 +47,30 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     index++
                     handler.postDelayed(this, 1000)
                 } else {
-                    countdownText.visibility = View.GONE
-                    // Aquí puedes iniciar el juego/temporizador real
+                    // Inicia el temporizador del juego
+                    val timerText = view?.findViewById<TextView>(R.id.timer_text) ?: return
+                    timerText.visibility = View.VISIBLE
+                    var warningPlayed = false
+val gameTimer = GameCountDownTimer(
+    30_000L,
+    1000L,
+    timerText,
+    onTickCallback = { secondsLeft ->
+        if (secondsLeft <= 5 && !warningPlayed) {
+            val warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
+            warningPlayer.setOnCompletionListener { mp -> mp.release() }
+            warningPlayer.start()
+            warningPlayed = true
+        }
+    },
+    onFinishCallback = {
+        val finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
+        finishedPlayer.setOnCompletionListener { mp -> mp.release() }
+        finishedPlayer.start()
+    }
+)
+gameTimer.start()
+                    gameTimer.start()
                 }
             }
         }
