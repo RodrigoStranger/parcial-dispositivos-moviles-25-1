@@ -68,6 +68,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         countdownText.visibility = View.VISIBLE
         timerText.visibility = View.VISIBLE // Siempre visible
         val countdownValues = listOf("3", "2", "1", "¡Empieza!")
+        // Ajusta estos tiempos según tu audio (en milisegundos)
+        val countdownTimes = listOf(0, 1000, 2000, 3000)
 
         // Sonido de conteo
         countdownPlayer?.release()
@@ -115,18 +117,21 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
         countdownPlayer?.start()
 
-        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
+        countdownRunnable?.let { countdownHandler?.removeCallbacks(it) }
         countdownHandler = Handler(Looper.getMainLooper())
         countdownRunnable = object : Runnable {
             override fun run() {
-                if (countdownIndex < countdownValues.size) {
-                    countdownText.text = countdownValues[countdownIndex]
-                    countdownIndex++
-                    countdownHandler?.postDelayed(this, 1000)
+                val pos = countdownPlayer?.currentPosition ?: 0
+                val idx = countdownTimes.indexOfLast { pos >= it }
+                if (idx in countdownValues.indices) {
+                    countdownText.text = countdownValues[idx]
+                }
+                if (countdownPlayer?.isPlaying == true) {
+                    countdownHandler?.postDelayed(this, 50)
                 }
             }
         }
-        countdownHandler?.postDelayed(countdownRunnable!!, 0)
+        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
     }
 
     override fun onDestroyView() {
