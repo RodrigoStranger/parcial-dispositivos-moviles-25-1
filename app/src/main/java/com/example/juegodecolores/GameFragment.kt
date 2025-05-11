@@ -31,6 +31,22 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val button3 = view.findViewById<Button>(R.id.button3)
         val button4 = view.findViewById<Button>(R.id.button4)
 
+        // Oculta los botones al inicio
+        button1.visibility = View.INVISIBLE
+        button2.visibility = View.INVISIBLE
+        button3.visibility = View.INVISIBLE
+        button4.visibility = View.INVISIBLE
+        // Oculta el texto 'Adivina el color' al inicio
+        val colorNameText = view.findViewById<TextView>(R.id.color_name_text)
+        colorNameText.visibility = View.INVISIBLE
+        colorNameText.setTextColor(requireContext().getColor(R.color.blanco))
+        // Oculta el texto 'nombre color' dinámico al inicio
+        val colorDynamicText = view.findViewById<TextView>(R.id.color_dynamic_text)
+        colorDynamicText.visibility = View.INVISIBLE
+        // Oculta la puntuación al inicio
+        val scoreText = view.findViewById<TextView>(R.id.score_text)
+        scoreText.visibility = View.INVISIBLE
+
         button1.setOnClickListener { v ->
             v.startAnimation(bounce)
             // Lógica adicional para el botón 1
@@ -87,6 +103,24 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             // Oculta el texto de conteo y muestra el timer, inicia el temporizador
             countdownText.visibility = View.GONE
             timerText.visibility = View.VISIBLE
+            // Muestra los botones ahora
+            val button1 = view?.findViewById<Button>(R.id.button1)
+            val button2 = view?.findViewById<Button>(R.id.button2)
+            val button3 = view?.findViewById<Button>(R.id.button3)
+            val button4 = view?.findViewById<Button>(R.id.button4)
+            button1?.visibility = View.VISIBLE
+            button2?.visibility = View.VISIBLE
+            button3?.visibility = View.VISIBLE
+            button4?.visibility = View.VISIBLE
+            // Muestra el texto 'Adivina el color' ahora
+            val colorNameText = view?.findViewById<TextView>(R.id.color_name_text)
+            colorNameText?.visibility = View.VISIBLE
+            // Muestra el texto 'nombre color' dinámico ahora
+            val colorDynamicText = view?.findViewById<TextView>(R.id.color_dynamic_text)
+            colorDynamicText?.visibility = View.VISIBLE
+            // Muestra la puntuación ahora
+            val scoreText = view?.findViewById<TextView>(R.id.score_text)
+            scoreText?.visibility = View.VISIBLE
             // Inicia el temporizador
             var warningPlayed = false
             val gameTimer = GameCountDownTimer(
