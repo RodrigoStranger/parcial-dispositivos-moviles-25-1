@@ -21,7 +21,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var isCountdownPaused: Boolean = false
     private var countdownHandler: Handler? = null
     private var countdownRunnable: Runnable? = null
-    private var backgroundPlayer: MediaPlayer? = null
+    // Elimina  y usa la música centralizada en MainActivity
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
 
@@ -169,12 +169,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             countdownPlayer = null
             countdownPosition = 0
             // Inicia la música de fondo (solo una vez)
-            if (backgroundPlayer == null) {
-                backgroundPlayer =
-                    MediaPlayer.create(requireContext(), R.raw.musica_de_fondo_desarrollo_resumen)
-                backgroundPlayer?.isLooping = true
-                backgroundPlayer?.start()
-            }
+            (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_desarrollo_resumen)
+
             // Oculta el texto de conteo y muestra el timer, inicia el temporizador
             countdownText.visibility = View.GONE
             timerText.visibility = View.VISIBLE
@@ -277,7 +273,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // No liberar backgroundPlayer aquí, para que siga sonando en ResultFragment
+
         warningPlayer?.release()
         warningPlayer = null
         finishedPlayer?.setOnCompletionListener(null)
@@ -289,7 +285,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        backgroundPlayer?.start()
+
         // Si el conteo estaba pausado, solo reanuda audio y handler
         if (isCountdownPaused) {
             countdownPlayer?.seekTo(countdownPosition)

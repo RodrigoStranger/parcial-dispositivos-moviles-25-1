@@ -11,21 +11,16 @@ import androidx.navigation.fragment.findNavController
 import android.content.pm.ActivityInfo
 
 class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
-    private var mediaPlayer: MediaPlayer? = null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mediaPlayer = MediaPlayer.create(requireContext(), R.raw.musica_de_fondo_inicio)
-        mediaPlayer?.isLooping = true
-        mediaPlayer?.start()
+        (activity as? MainActivity)?.detenerMusicaFondo()
+        (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
 
         val botonJugar = view.findViewById<Button>(R.id.iniciarJuegoButton)
         botonJugar.setOnClickListener {
             val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
             // Detén la música de fondo inmediatamente
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
+            (activity as? MainActivity)?.detenerMusicaFondo()
             botonJugar.startAnimation(anim)
             anim.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
@@ -37,21 +32,15 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mediaPlayer?.release()
-        mediaPlayer = null
-    }
-
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        mediaPlayer?.start()
+        (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
     }
 
     override fun onPause() {
         super.onPause()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        mediaPlayer?.pause()
+        (activity as? MainActivity)?.detenerMusicaFondo()
     }
 }

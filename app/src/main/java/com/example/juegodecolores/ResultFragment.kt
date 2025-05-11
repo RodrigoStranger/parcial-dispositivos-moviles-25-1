@@ -4,8 +4,10 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.os.Bundle
 import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 
 class ResultFragment : Fragment(R.layout.fragment_result) {
+    private var puntuacionPlayer: android.media.MediaPlayer? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Recupera el score enviado por argumentos con Bundle
@@ -14,15 +16,42 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
         val textViewResult = view.findViewById<TextView>(R.id.textViewResult)
         textViewResult.text = getString(R.string.resultado_text, score)
         // Reproduce el sonido de puntuación
-        val puntuacionPlayer = android.media.MediaPlayer.create(requireContext(), R.raw.sonido_puntuacion)
-        puntuacionPlayer.setOnCompletionListener { it.release() }
-        puntuacionPlayer.start()
+        puntuacionPlayer = android.media.MediaPlayer.create(requireContext(), R.raw.sonido_puntuacion)
+        puntuacionPlayer?.setOnCompletionListener {
+            it.release()
+            puntuacionPlayer = null
+        }
+        puntuacionPlayer?.start()
         // Animación bounce para los botones
-        val bounce = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
         val volverMenu = view.findViewById<android.widget.Button>(R.id.volverMenuInicioButton)
         val volverJugar = view.findViewById<android.widget.Button>(R.id.volverAJugarButton)
-        volverMenu.setOnClickListener { it.startAnimation(bounce) }
-        volverJugar.setOnClickListener { it.startAnimation(bounce) }
+        volverMenu.setOnClickListener {
+            val bounce = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
+            bounce.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
+                override fun onAnimationStart(animation: android.view.animation.Animation?) {}
+                override fun onAnimationRepeat(animation: android.view.animation.Animation?) {}
+                override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    puntuacionPlayer?.stop()
+                    puntuacionPlayer?.release()
+                    puntuacionPlayer = null
+                    (activity as? MainActivity)?.detenerMusicaFondo()
+                    (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
+                    findNavController().navigate(R.id.action_resultFragment_to_welcomeFragment)
+                }
+            })
+            it.startAnimation(bounce)
+        }
+        volverJugar.setOnClickListener {
+            val bounce = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
+            bounce.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
+                override fun onAnimationStart(animation: android.view.animation.Animation?) {}
+                override fun onAnimationRepeat(animation: android.view.animation.Animation?) {}
+                override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    findNavController().popBackStack()
+                }
+            })
+            it.startAnimation(bounce)
+        }
         // Bloquear botón back
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
@@ -30,6 +59,13 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
                 // No hacer nada: bloquea la tecla atrás
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        puntuacionPlayer?.stop()
+        puntuacionPlayer?.release()
+        puntuacionPlayer = null
     }
 
     override fun onResume() {
