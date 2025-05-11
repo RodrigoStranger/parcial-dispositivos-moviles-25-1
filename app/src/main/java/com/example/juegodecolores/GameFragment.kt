@@ -11,6 +11,7 @@ import android.media.MediaPlayer
 import android.os.Looper
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import androidx.navigation.fragment.findNavController
 
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var countdownPlayer: MediaPlayer? = null
@@ -223,6 +224,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     buttonIds.forEach { id ->
                         view?.findViewById<Button>(id)?.isEnabled = false
                     }
+                    // Navega a ResultFragment pasando el puntaje
+                    val bundle = Bundle()
+                    bundle.putInt("score", score)
+                    findNavController().navigate(R.id.action_gameFragment_to_resultFragment, bundle)
                 }
             )
             gameTimer.start()
