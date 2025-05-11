@@ -16,6 +16,16 @@ class MainActivity : AppCompatActivity() {
         musicaFondo?.start()
     }
 
+    fun pausarMusicaFondo() {
+        musicaFondo?.pause()
+    }
+
+    fun reanudarMusicaFondo() {
+        if (musicaFondo != null && !musicaFondo!!.isPlaying) {
+            musicaFondo?.start()
+        }
+    }
+
     fun detenerMusicaFondo() {
         musicaFondo?.stop()
         musicaFondo?.release()

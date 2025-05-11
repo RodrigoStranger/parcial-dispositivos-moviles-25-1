@@ -285,13 +285,26 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        // Si el conteo estaba pausado, solo reanuda audio y handler
+        (activity as? MainActivity)?.reanudarMusicaFondo()
+        // Si el conteo estaba pausado, reanuda audio y texto
         if (isCountdownPaused) {
             countdownPlayer?.seekTo(countdownPosition)
             countdownPlayer?.start()
             countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
             isCountdownPaused = false
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (activity as? MainActivity)?.pausarMusicaFondo()
+        // Pausar conteo 3-2-1 si está activo
+        if (countdownPlayer?.isPlaying == true) {
+            countdownPlayer?.pause()
+            countdownPosition = countdownPlayer?.currentPosition ?: 0
+            isCountdownPaused = true
+        }
+        // Pausar el handler del texto
+        countdownRunnable?.let { countdownHandler?.removeCallbacks(it) }
     }
 }

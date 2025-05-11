@@ -35,12 +35,12 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
+        (activity as? MainActivity)?.reanudarMusicaFondo()
     }
 
     override fun onPause() {
         super.onPause()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        (activity as? MainActivity)?.detenerMusicaFondo()
+        (activity as? MainActivity)?.pausarMusicaFondo()
     }
 }
