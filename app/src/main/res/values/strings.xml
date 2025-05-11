@@ -1,3 +1,13 @@
 <resources>
+    <!-- nombre de la app -->
     <string name="app_name">Juego de colores</string>
+
+    <!-- Recursos de WelcomeFragment -->
+    <string name="titulo_juego">Juego de Colores</string>
+    <string name="iniciar_juego">Jugar</string>
+    <string name="descripcion_juego">El juego consiste en presionar el botón que coincida con el color que aparece en la pantalla</string>
+
+
+
+
 </resources>
