@@ -15,7 +15,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var backgroundPlayer: MediaPlayer? = null
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
-
+    private var mediaPlayer: MediaPlayer? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -127,10 +127,14 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        backgroundPlayer?.start()
     }
 
     override fun onPause() {
         super.onPause()
+        backgroundPlayer?.pause()
+        warningPlayer?.pause()
+        finishedPlayer?.pause()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
