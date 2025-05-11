@@ -12,6 +12,12 @@ import android.os.Looper
 import android.view.animation.AnimationUtils
 
 class GameFragment : Fragment(R.layout.fragment_game) {
+    private var countdownPlayer: MediaPlayer? = null
+    private var countdownPosition: Int = 0
+    private var countdownIndex: Int = 0
+    private var isCountdownPaused: Boolean = false
+    private var countdownHandler: Handler? = null
+    private var countdownRunnable: Runnable? = null
     private var backgroundPlayer: MediaPlayer? = null
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
@@ -50,9 +56,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             }
         })
 
-        Handler(Looper.getMainLooper()).postDelayed({
+        // Solo inicia el conteo la primera vez
+        if (!isCountdownPaused) {
             startCountdown()
-        }, 1000)
+        }
     }
 
     private fun startCountdown() {
@@ -61,12 +68,15 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         countdownText.visibility = View.VISIBLE
         timerText.visibility = View.VISIBLE // Siempre visible
         val countdownValues = listOf("3", "2", "1", "¡Empieza!")
-        var index = 0
 
         // Sonido de conteo
-        val mediaPlayer = MediaPlayer.create(requireContext(), R.raw.musica_conteo_3_2_1_empieza)
-        mediaPlayer.setOnCompletionListener {
+        countdownPlayer?.release()
+        countdownPlayer = MediaPlayer.create(requireContext(), R.raw.musica_conteo_3_2_1_empieza)
+        countdownPlayer?.seekTo(countdownPosition)
+        countdownPlayer?.setOnCompletionListener {
             it.release()
+            countdownPlayer = null
+            countdownPosition = 0
             // Inicia la música de fondo (solo una vez)
             if (backgroundPlayer == null) {
                 backgroundPlayer = MediaPlayer.create(requireContext(), R.raw.musica_de_fondo_desarrollo_resumen)
@@ -100,18 +110,23 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             )
             gameTimer.start()
         }
-        mediaPlayer.start()
+        if (!isCountdownPaused) {
+            countdownIndex = 0
+        }
+        countdownPlayer?.start()
 
-        val handler = Handler(Looper.getMainLooper())
-        lateinit var runnable: Runnable
-        runnable = Runnable {
-            if (index < countdownValues.size) {
-                countdownText.text = countdownValues[index]
-                index++
-                handler.postDelayed(runnable, 1000)
+        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
+        countdownHandler = Handler(Looper.getMainLooper())
+        countdownRunnable = object : Runnable {
+            override fun run() {
+                if (countdownIndex < countdownValues.size) {
+                    countdownText.text = countdownValues[countdownIndex]
+                    countdownIndex++
+                    countdownHandler?.postDelayed(this, 1000)
+                }
             }
         }
-        handler.post(runnable)
+        countdownHandler?.postDelayed(countdownRunnable!!, 0)
     }
 
     override fun onDestroyView() {
@@ -128,6 +143,13 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         backgroundPlayer?.start()
+        // Si el conteo estaba pausado, solo reanuda audio y handler
+        if (isCountdownPaused) {
+            countdownPlayer?.seekTo(countdownPosition)
+            countdownPlayer?.start()
+            countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
+            isCountdownPaused = false
+        }
     }
 
     override fun onPause() {
@@ -135,6 +157,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         backgroundPlayer?.pause()
         warningPlayer?.pause()
         finishedPlayer?.pause()
+        countdownPlayer?.pause()
+        countdownPosition = countdownPlayer?.currentPosition ?: 0
+        isCountdownPaused = true
+        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
