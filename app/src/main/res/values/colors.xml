@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-
-
-    <color name="white">#FFFFFFFF</color>
+    <color name="negro">#FF000000</color>
+    <color name="blanco">#FFFFFFFF</color>
     <color name="rojo">#FF3B30</color>
     <color name="violeta">#831bbf</color>
     <color name="naranja">#FF8000</color>
     <color name="verde">#34C759</color>
     <color name="azul">#007AFF</color>
+    <color name="rosado">#FF69B4</color>
+    <color name="amarillo">#FFE066</color>
+    <color name="marron">#8B5C2D</color>
 
 </resources>

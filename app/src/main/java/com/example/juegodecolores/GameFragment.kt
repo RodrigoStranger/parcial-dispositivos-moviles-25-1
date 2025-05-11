@@ -97,7 +97,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     if (secondsLeft <= 5) {
                         timerText.setTextColor(requireContext().getColor(R.color.rojo))
                     } else {
-                        timerText.setTextColor(requireContext().getColor(R.color.white))
+                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
                     }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
