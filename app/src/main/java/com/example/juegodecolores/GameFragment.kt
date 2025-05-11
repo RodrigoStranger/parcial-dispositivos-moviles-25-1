@@ -54,6 +54,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             val btn = view?.findViewById<Button>(buttonIds[i])
             btn?.setBackgroundTintList(android.content.res.ColorStateList.valueOf(requireContext().getColor(currentColors[i].colorRes)))
             btn?.tag = currentColors[i].name // Guarda el nombre del color en el tag
+            btn?.isEnabled = true // Habilita el botón para la nueva ronda
         }
         // Muestra el nombre del color objetivo
         val colorNameText = view?.findViewById<TextView>(R.id.color_dynamic_text)
@@ -113,6 +114,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             btn.setOnClickListener { v ->
                 v.startAnimation(bounce)
                 if (!gameActive) return@setOnClickListener
+                // Permite solo un click por ronda
+                buttons.forEach { it.isEnabled = false }
                 val elegido = btn.tag as? String
                 val correcto = targetColor?.name
                 if (elegido != null && correcto != null) {
