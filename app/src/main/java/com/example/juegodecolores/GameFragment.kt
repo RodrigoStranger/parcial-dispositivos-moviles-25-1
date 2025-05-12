@@ -13,6 +13,9 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 
+// Este fragmento es el núcleo del juego. Aquí gestiono la lógica principal:
+// muestro el color objetivo, manejo los botones de selección, controlo el temporizador,
+// la puntuación y los sonidos. Toda la experiencia interactiva del usuario ocurre en este fragmento.
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var hasNavigated = false // Evita doble navegación
     private var countdownPlayer: MediaPlayer? = null
@@ -48,13 +51,19 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     private var score = 0
     private var gameActive = false
 
+    /**
+     * Inicia una nueva ronda del juego: selecciono los colores, asigno los botones y
+     * muestro el color objetivo.
+     */
+
     private fun iniciarNuevaRonda() {
         if (!gameActive) return
         // Selecciona 4 colores distintos
+        // Selecciono 4 colores aleatorios para esta ronda.
         currentColors = colorOptions.shuffled().take(4)
-        // Selecciona uno de esos como objetivo
+        // Elijo uno de esos colores como el objetivo a adivinar.
         targetColor = currentColors.random()
-        // Asigna colores a los botones
+        // Asigno cada color a un botón y guardo el nombre como tag para comparar después.
         val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
         for (i in 0..3) {
             val btn = view?.findViewById<Button>(buttonIds[i])
@@ -65,90 +74,105 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     )
                 )
             )
-            btn?.tag = currentColors[i].name // Guarda el nombre del color en el tag
-            btn?.isEnabled = true // Habilita el botón para la nueva ronda
+            btn?.tag = currentColors[i].name // Así sé qué color representa cada botón.
+            btn?.isEnabled = true // Habilito el botón para que el usuario pueda responder.
         }
-        // Muestra el nombre del color objetivo
+        // Muestro el nombre del color objetivo que el usuario debe identificar.
         val colorNameText = view?.findViewById<TextView>(R.id.color_dynamic_text)
         colorNameText?.text = targetColor?.name
     }
 
+    /**
+     * Muestra el resultado de la selección del usuario (acierto/error),
+     * reproduce el sonido correspondiente y prepara la siguiente ronda.
+     */
+
     private fun mostrarResultado(acierto: Boolean) {
+        // Muestro una imagen y reproduzco un sonido según si el usuario acertó o no.
         val imageView = view?.findViewById<ImageView>(R.id.game_image)
         val mediaPlayer = if (acierto) {
-            imageView?.setImageResource(R.drawable.bien) // bien.png
-            MediaPlayer.create(requireContext(), R.raw.sonido_correcto)
+            imageView?.setImageResource(R.drawable.bien) // Imagen de acierto
+            MediaPlayer.create(requireContext(), R.raw.sonido_correcto) // Sonido de acierto
         } else {
-            imageView?.setImageResource(R.drawable.error) // mal.png
-            MediaPlayer.create(requireContext(), R.raw.sonido_error)
+            imageView?.setImageResource(R.drawable.error) // Imagen de error
+            MediaPlayer.create(requireContext(), R.raw.sonido_error) // Sonido de error
         }
         imageView?.visibility = View.VISIBLE
         mediaPlayer.setOnCompletionListener {
             imageView?.visibility = View.INVISIBLE
             mediaPlayer.release()
-            // Siguiente ronda si el juego sigue activo
+            // Si el juego sigue activo, inicio la siguiente ronda automáticamente.
             if (gameActive) iniciarNuevaRonda()
         }
         mediaPlayer.start()
     }
 
+    /**
+     * Se llama cuando la vista del fragmento ha sido creada. Aquí inicializo los botones,
+     * oculto elementos, y preparo el juego para el usuario.
+     */
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Animación bounce para los 4 botones
+        // Preparo la animación bounce para dar feedback visual en los botones.
         val bounce = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
         val button1 = view.findViewById<Button>(R.id.button1)
         val button2 = view.findViewById<Button>(R.id.button2)
         val button3 = view.findViewById<Button>(R.id.button3)
         val button4 = view.findViewById<Button>(R.id.button4)
 
-        // Oculta los botones al inicio
+        // Al iniciar el fragmento, oculto todos los elementos del juego para mostrarlos solo cuando corresponda.
         button1.visibility = View.INVISIBLE
         button2.visibility = View.INVISIBLE
         button3.visibility = View.INVISIBLE
         button4.visibility = View.INVISIBLE
-        // Oculta el texto 'Adivina el color' al inicio
+        // Oculto el texto "Adivina el color" y el texto dinámico.
         val colorNameText = view.findViewById<TextView>(R.id.color_name_text)
         colorNameText.visibility = View.INVISIBLE
         colorNameText.setTextColor(requireContext().getColor(R.color.blanco))
-        // Oculta el texto 'nombre color' dinámico al inicio
         val colorDynamicText = view.findViewById<TextView>(R.id.color_dynamic_text)
         colorDynamicText.visibility = View.INVISIBLE
-        // Oculta la puntuación al inicio
+        // Oculto la puntuación al inicio.
         val scoreText = view.findViewById<TextView>(R.id.score_text)
         scoreText.visibility = View.INVISIBLE
 
         val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
         val buttons = buttonIds.map { view.findViewById<Button>(it) }
 
+        // Para cada botón, asigno el listener que gestiona la lógica de selección de color.
         buttons.forEach { btn ->
             btn.setOnClickListener { v ->
-                v.startAnimation(bounce)
-                if (!gameActive) return@setOnClickListener
-                // Permite solo un click por ronda
+                v.startAnimation(bounce) // Feedback visual al pulsar
+                if (!gameActive) return@setOnClickListener // Ignoro si el juego no está activo
+                // Desactivo todos los botones para evitar múltiples respuestas en una ronda
                 buttons.forEach { it.isEnabled = false }
-                val elegido = btn.tag as? String
-                val correcto = targetColor?.name
+                val elegido = btn.tag as? String // Qué color eligió el usuario
+                val correcto = targetColor?.name // Cuál era el color correcto
                 if (elegido != null && correcto != null) {
                     if (elegido == correcto) {
+                        // Si acierta, sumo un punto y actualizo la puntuación
                         score++
                         scoreText.text = getString(R.string.score_text, score)
                         mostrarResultado(true)
                     } else {
+                        // Si falla, muestro el feedback de error
                         mostrarResultado(false)
                     }
                 }
             }
         }
 
+        // Bloqueo el botón físico "atrás" para que el usuario no salga accidentalmente del juego.
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // No hacer nada: bloquea la tecla atrás
+                // Bloqueo la tecla de atrás.
             }
         })
 
         // Solo inicia el conteo la primera vez
+        // Si el conteo no está pausado (primera vez), lo inicio.
         if (!isCountdownPaused) {
             startCountdown()
         }
@@ -310,10 +334,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 override fun onTick(millisUntilFinished: Long) {
                     tiempoRestante = millisUntilFinished
                     val minutes = (millisUntilFinished / 1000) / 60
-val seconds = (millisUntilFinished / 1000) % 60
-// Formato mm:ss
-val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
-timerText.text = timeFormatted
+                    val seconds = (millisUntilFinished / 1000) % 60
+                    // Formato mm:ss
+                    val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+                    timerText.text = timeFormatted
                     val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
                     if (secondsLeft <= 5) {
                         timerText.setTextColor(requireContext().getColor(R.color.rojo))

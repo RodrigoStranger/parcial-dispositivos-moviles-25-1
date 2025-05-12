@@ -85,7 +85,7 @@ class ResultFragment : Fragment(R.layout.fragment_result) {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // No hago nada aquí para bloquear la tecla atrás.
+                // Bloqueo la tecla de atrás.
             }
         })
     }
