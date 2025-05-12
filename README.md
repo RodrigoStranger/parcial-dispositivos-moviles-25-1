@@ -13,6 +13,11 @@ El juego consta del reconocimiento de colores donde el usuario debe presionar el
 
 ---
 
+## 🔗 Documentación (DeepWiki)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/RodrigoStranger/parcial-dispositivos-moviles-25-1)
+
+---
+
 ### 🎯 Objetivo
 El objetivo es lograr la mayor cantidad de aciertos posibles en 30 segundos.
 
