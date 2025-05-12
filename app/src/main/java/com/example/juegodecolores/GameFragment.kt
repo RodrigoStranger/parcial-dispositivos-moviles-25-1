@@ -227,27 +227,27 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             // Inicia el temporizador
             tiempoRestante = 30_000L
             timerText.setTextColor(requireContext().getColor(R.color.blanco))
-            var warningPlayed = false
-            gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {
-                override fun onTick(millisUntilFinished: Long) {
+            var warningPlayed = false // Marca si se ha reproducido el sonido de advertencia
+            gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {  
+                override fun onTick(millisUntilFinished: Long) { // Cada 50ms
                     tiempoRestante = millisUntilFinished
-                    val minutes = (millisUntilFinished / 1000) / 60
-                    val seconds = (millisUntilFinished / 1000) % 60
+                    val minutes = (millisUntilFinished / 1000) / 60 // Minutos restantes
+                    val seconds = (millisUntilFinished / 1000) % 60 // Segundos restantes
                     // Formato mm:ss
                     val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
                     timerText.text = timeFormatted
                     val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
-                    if (secondsLeft <= 5) {
-                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
+                    if (secondsLeft <= 5) { // Si queda menos de 5 segundos
+                        timerText.setTextColor(requireContext().getColor(R.color.rojo)) // Cambio el color del texto
                     } else {
-                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
+                        timerText.setTextColor(requireContext().getColor(R.color.blanco)) // Cambio el color del texto
                     }
-                    if (secondsLeft <= 5 && !warningPlayed) {
-                        warningPlayer?.release()
+                    if (secondsLeft <= 5 && !warningPlayed) { // Si queda menos de 5 segundos y no se ha reproducido el sonido de advertencia
+                        warningPlayer?.release() // Libero el sonido de advertencia
                         warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
-                        warningPlayer?.setOnCompletionListener { mp -> mp.release() }
-                        warningPlayer?.start()
-                        warningPlayed = true
+                        warningPlayer?.setOnCompletionListener { mp -> mp.release() } // Libero el sonido de advertencia
+                        warningPlayer?.start() // Reproduzco el sonido de advertencia
+                        warningPlayed = true // Marca que se ha reproducido el sonido de advertencia
                     }
                 }
                 override fun onFinish() {
@@ -257,63 +257,67 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
                         mp.release()
-                        if (!hasNavigated && isAdded && view != null) {
+                        if (!hasNavigated && isAdded && view != null) { // Si no se ha navegado y la vista sigue siendo visible
                             hasNavigated = true
                             try {
+                                // Envio el puntaje al ResultFragment
                                 val bundle = Bundle()
                                 bundle.putInt("score", score)
+                                // Navego al ResultFragment
                                 findNavController().navigate(
-                                    R.id.action_gameFragment_to_resultFragment,
-                                    bundle
+                                    R.id.action_gameFragment_to_resultFragment, // Accion de navegacion
+                                    bundle // Puntaje
                                 )
                             } catch (e: Exception) {
-                                e.printStackTrace()
+                                e.printStackTrace() // Imprimo el error
                             }
                         }
                     }
-                    finishedPlayer?.start()
-                    gameActive = false
-                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+                    finishedPlayer?.start() // Reproduzco el sonido de fin
+                    gameActive = false // Marca que el juego no esta activo
+                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4) // Lista de botones
                     buttonIds.forEach { id ->
-                        view?.findViewById<Button>(id)?.isEnabled = false
+                        view?.findViewById<Button>(id)?.isEnabled = false // Deshabilito los botones
                     }
                 }
             }
-            gameTimer?.start()
+            gameTimer?.start() // Inicio el temporizador
         }
         if (!isCountdownPaused) {
-            countdownIndex = 0
+            countdownIndex = 0 // Inicializo el conteo
         }
-        countdownPlayer?.start()
-
+        countdownPlayer?.start() // Reproduzco el sonido de conteo
+        // Inicio el conteo
         countdownRunnable?.let { countdownHandler?.removeCallbacks(it) }
         countdownHandler = Handler(Looper.getMainLooper())
-        countdownRunnable = object : Runnable {
+        countdownRunnable = object : Runnable { // Runnable para el conteo
             override fun run() {
                 val pos = countdownPlayer?.currentPosition ?: 0
                 val idx = countdownTimes.indexOfLast { pos >= it }
-                if (idx in countdownValues.indices) {
+                if (idx in countdownValues.indices) { // Si el indice esta dentro del rango
                     countdownText.text = countdownValues[idx]
                 }
-                if (countdownPlayer?.isPlaying == true) {
-                    countdownHandler?.postDelayed(this, 50)
+                if (countdownPlayer?.isPlaying == true) { // Si el sonido de conteo esta reproduciendo
+                    countdownHandler?.postDelayed(this, 50) // Reproduzco el sonido de conteo
                 }
             }
         }
-        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
+        countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) } // Inicio el conteo
     }
 
+    // Libero los recursos al destruir la vista
     override fun onDestroyView() {
         super.onDestroyView()
 
-        warningPlayer?.release()
-        warningPlayer = null
+        warningPlayer?.release() // Libero el sonido de advertencia
+        warningPlayer = null // Limpio el MediaPlayer
         finishedPlayer?.setOnCompletionListener(null)
-        finishedPlayer?.release()
-        finishedPlayer = null
+        finishedPlayer?.release() // Libero el sonido de fin
+        finishedPlayer = null // Limpio el MediaPlayer
         hasNavigated = false // Reinicia flag al destruir vista
     }
 
+    // Se llama cuando el fragmento se vuelve visible
     override fun onResume() {
         super.onResume()
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -339,17 +343,17 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
                     timerText.text = timeFormatted
                     val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
-                    if (secondsLeft <= 5) {
-                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
-                    } else {
-                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
-                    }
-                    if (secondsLeft <= 5 && !warningPlayed) {
-                        warningPlayer?.release()
+                    if (secondsLeft <= 5) { // Si queda menos de 5 segundos
+                        timerText.setTextColor(requireContext().getColor(R.color.rojo)) // Cambio el color del texto
+                    } else { // Si queda mas de 5 segundos
+                        timerText.setTextColor(requireContext().getColor(R.color.blanco)) // Cambio el color del texto
+                    } 
+                    if (secondsLeft <= 5 && !warningPlayed) { // Si queda menos de 5 segundos y no se ha reproducido el sonido de advertencia
+                        warningPlayer?.release() // Libero el sonido de advertencia
                         warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
-                        warningPlayer?.setOnCompletionListener { mp -> mp.release() }
-                        warningPlayer?.start()
-                        warningPlayed = true
+                        warningPlayer?.setOnCompletionListener { mp -> mp.release() }  // Libero el sonido de advertencia
+                        warningPlayer?.start() // Reproduzco el sonido de advertencia
+                        warningPlayed = true // Marca que se ha reproducido el sonido de advertencia
                     }
                 }
                 override fun onFinish() {
@@ -358,26 +362,26 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
-                        mp.release()
-                        if (!hasNavigated && isAdded && view != null) {
-                            hasNavigated = true
+                        mp.release() // Libero el sonido de fin
+                        if (!hasNavigated && isAdded && view != null) { // Si no se ha navegado y el fragmento esta agregado
+                            hasNavigated = true // Marca que se ha navegado
                             try {
-                                val bundle = Bundle()
-                                bundle.putInt("score", score)
-                                findNavController().navigate(
-                                    R.id.action_gameFragment_to_resultFragment,
-                                    bundle
+                                val bundle = Bundle() // Creo el bundle
+                                bundle.putInt("score", score) // Agrego el puntaje
+                                findNavController().navigate( // Navego al ResultFragment
+                                    R.id.action_gameFragment_to_resultFragment, // Accion de navegacion
+                                    bundle // Puntaje
                                 )
                             } catch (e: Exception) {
-                                e.printStackTrace()
+                                e.printStackTrace() // Imprimo el error
                             }
                         }
-                    }
-                    finishedPlayer?.start()
-                    gameActive = false
+                    } // Fin del temporizador
+                    finishedPlayer?.start() // Reproduzco el sonido de fin
+                    gameActive = false // Marca que el juego no esta activo
                     val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
                     buttonIds.forEach { id ->
-                        view?.findViewById<Button>(id)?.isEnabled = false
+                        view?.findViewById<Button>(id)?.isEnabled = false // Deshabilito los botones
                     }
                 }
             }
@@ -385,7 +389,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
     }
 
-    override fun onPause() {
+    override fun onPause() { // Se llama cuando el fragmento se vuelve invisible
         super.onPause()
         (activity as? MainActivity)?.pausarMusicaFondo()
         // Pausar conteo 3-2-1 si está activo
