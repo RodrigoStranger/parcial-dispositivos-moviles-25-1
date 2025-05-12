@@ -22,9 +22,9 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Siempre me aseguro de detener cualquier música previa antes de iniciar la música de bienvenida.
-        (activity as? MainActivity)?.detenerMusicaFondo()
+        (activity as? MainActivity)?.detenerMusicaFondo() // Detengo la música de fondo.
         // Inicio la música de fondo específica para la pantalla de bienvenida.
-        (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
+        (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio) // Inicio la música de fondo.
 
         // Busco el botón para iniciar el juego.
         val botonJugar = view.findViewById<Button>(R.id.iniciarJuegoButton)
@@ -32,12 +32,12 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
         botonJugar.setOnClickListener {
             val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
             // Detengo la música de fondo antes de pasar al juego para evitar que se solape con la música del juego.
-            (activity as? MainActivity)?.detenerMusicaFondo()
-            botonJugar.startAnimation(anim)
+            (activity as? MainActivity)?.detenerMusicaFondo() // Detengo la música de fondo.
+            botonJugar.startAnimation(anim) // Aplico la animación al botón.
             anim.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {}
-                override fun onAnimationRepeat(animation: Animation?) {}
-                override fun onAnimationEnd(animation: Animation?) {
+                override fun onAnimationStart(animation: Animation?) {} // No se usa.
+                override fun onAnimationRepeat(animation: Animation?) {} // No se usa.
+                override fun onAnimationEnd(animation: Animation?) { // Cuando termina la animación
                     // Cuando termina la animación, navego al fragmento del juego.
                     findNavController().navigate(R.id.action_welcomeFragment_to_gameFragment)
                 }
@@ -51,7 +51,7 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
      */
 
     override fun onResume() {
-        super.onResume()
+        super.onResume() // Llamada al metodo de la clase padre
         // Bloqueo la pantalla en modo vertical para mantener la interfaz consistente.
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         // Reanudo la música de fondo si estaba pausada.
@@ -64,7 +64,7 @@ class WelcomeFragment : Fragment(R.layout.fragment_welcome) {
      */
 
     override fun onPause() {
-        super.onPause()
+        super.onPause() // Llamada al metodo de la clase padre
         // Permito que la pantalla rote libremente cuando salgo de este fragmento.
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         // Pauso la música de fondo para ahorrar recursos.
