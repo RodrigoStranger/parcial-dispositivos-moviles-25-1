@@ -141,13 +141,13 @@ Muestra la pantalla de bienvenida, controla la música y la orientación (línea
 ### 🧩 Lógica de los Botones en ResultFragment
 En [`ResultFragment`](https://github.com/RodrigoStranger/parcial-dispositivos-moviles-25-1/blob/main/app/src/main/java/com/example/juegodecolores/ResultFragment.kt) (líneas 61-70) se define la lógica de los dos botones principales:
 - 🔄 Uno para reiniciar el juego.
-```kotlin
-override fun onAnimationEnd(animation: android.view.animation.Animation?) {
-                    // Detengo la música y regreso al fragmento anterior para reiniciar el juego.
-                    (activity as? MainActivity)?.detenerMusicaFondo()
-                    findNavController().popBackStack()
-                }
-```
+   ```kotlin
+   override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                       // Detengo la música y regreso al fragmento anterior para reiniciar el juego.
+                       (activity as? MainActivity)?.detenerMusicaFondo()
+                       findNavController().popBackStack()
+                   }
+   ```
 - 🏠 Otro para volver al menú principal.
   ```kotlin
    override fun onAnimationEnd(animation: android.view.animation.Animation?) {
