@@ -141,18 +141,30 @@ Muestra la pantalla de bienvenida, controla la música y la orientación (línea
 ### 🧩 Lógica de los Botones en ResultFragment
 En [`ResultFragment`](https://github.com/RodrigoStranger/parcial-dispositivos-moviles-25-1/blob/main/app/src/main/java/com/example/juegodecolores/ResultFragment.kt) (líneas 61-70) se define la lógica de los dos botones principales:
 - 🔄 Uno para reiniciar el juego.
-- 🏠 Otro para volver al menú principal.
 ```kotlin
-// Volver a jugar
-binding.btnReiniciar.setOnClickListener {
-    findNavController().navigate(R.id.action_resultFragment_to_gameFragment)
-}
-// Volver al menú
-binding.btnMenu.setOnClickListener {
-    findNavController().navigate(R.id.action_resultFragment_to_welcomeFragment)
-}
+override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    // Detengo la música y regreso al fragmento anterior para reiniciar el juego.
+                    (activity as? MainActivity)?.detenerMusicaFondo()
+                    findNavController().popBackStack()
+                }
 ```
+- 🏠 Otro para volver al menú principal.
+  ```kotlin
+   override fun onAnimationEnd(animation: android.view.animation.Animation?) {
+                    // Detengo y libero el sonido de puntuación para evitar que siga sonando.
+                    puntuacionPlayer?.stop()
+                    puntuacionPlayer?.release()
+                    puntuacionPlayer = null
 
+                    // Cambio la música de fondo a la del menú principal.
+                    (activity as? MainActivity)?.detenerMusicaFondo()
+                    (activity as? MainActivity)?.iniciarMusicaFondo(R.raw.musica_de_fondo_inicio)
+
+                    // Navego hacia el fragmento de bienvenida.
+                    findNavController().navigate(R.id.action_resultFragment_to_welcomeFragment)
+                }
+
+   ```
 ## 📊 Análisis de Resultados
 - 🏆 **Puntaje Final:** El puntaje final se muestra en el fragmento de resultados, y se reproduce el sonido de puntuación.
 - 💬 **Mensajes de Resultado:** Dependiendo del puntaje obtenido, se muestra un mensaje de resultado.
