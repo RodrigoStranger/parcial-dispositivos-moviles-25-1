@@ -6,7 +6,7 @@
 ✍ **Autor**: Rodrigo Emerson Infanzón Acosta  
 
 ---
-## 🔗 Documentación (DeepWiki)
+## 🔗 Documentación DeepWiki
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/RodrigoStranger/parcial-dispositivos-moviles-25-1)
 
 
