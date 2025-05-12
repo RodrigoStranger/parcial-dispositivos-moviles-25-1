@@ -44,16 +44,16 @@ class MainActivity : AppCompatActivity() {
     // Declaro una variable para manejar la música de fondo durante el juego.
     private var musicaFondo: MediaPlayer? = null
 
-    /*
-     Decidí poner las funciones relacionadas con la música de fondo en el 
-     MainActivity porque esta actividad es el punto central de la aplicación y 
-     está activa durante toda la experiencia del usuario. De esta manera, 
-     puedo controlar la música de fondo de manera global, asegurando que 
-     suene mientras el usuario navega entre fragmentos y se detenga o pause 
-     correctamente según el ciclo de vida de la app. 
-     Así evito tener que duplicar código en cada fragmento y centralizo el manejo de recursos 
-     importantes como el MediaPlayer.
-    */
+    /**
+     * Decidí poner las funciones relacionadas con la música de fondo en el
+     * MainActivity porque esta actividad es el punto central de la aplicación y
+     * está activa durante toda la experiencia del usuario. De esta manera,
+     * puedo controlar la música de fondo de manera global, asegurando que
+     * suene mientras el usuario navega entre fragmentos y se detenga o pause
+     * correctamente según el ciclo de vida de la app.
+     * Así evito tener que duplicar código en cada fragmento y centralizo el manejo de recursos
+     * importantes como el MediaPlayer.
+     */
 
     // Esta función la uso para iniciar la música de fondo cuando el usuario entra al juego.
     fun iniciarMusicaFondo(resId: Int) {
