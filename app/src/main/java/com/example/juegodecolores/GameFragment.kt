@@ -24,6 +24,9 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     // Elimina  y usa la música centralizada en MainActivity
     private var warningPlayer: MediaPlayer? = null
     private var finishedPlayer: MediaPlayer? = null
+    // --- TEMPORIZADOR ---
+    private var tiempoRestante: Long = 30_000L
+    private var gameTimer: android.os.CountDownTimer? = null
 
     // --- Lógica de colores ---
     data class ColorOption(val name: String, val colorRes: Int)
@@ -198,27 +201,35 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             scoreText?.text = getString(R.string.score_text, 0)
             iniciarNuevaRonda()
             // Inicia el temporizador
+            tiempoRestante = 30_000L
+            val timerText = view?.findViewById<TextView>(R.id.timer_text)
+            timerText?.setTextColor(requireContext().getColor(R.color.blanco))
             var warningPlayed = false
-            val gameTimer = GameCountDownTimer(
-                30_000L,
-                1000L,
-                timerText,
-                onTickCallback = { secondsLeft ->
+            gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {
+                override fun onTick(millisUntilFinished: Long) {
+                    tiempoRestante = millisUntilFinished
+                    val minutes = (millisUntilFinished / 1000) / 60
+val seconds = (millisUntilFinished / 1000) % 60
+// Formato mm:ss
+val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+timerText?.text = timeFormatted
+                    val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
                     if (secondsLeft <= 5) {
-                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
+                        timerText?.setTextColor(requireContext().getColor(R.color.rojo))
                     } else {
-                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
+                        timerText?.setTextColor(requireContext().getColor(R.color.blanco))
                     }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
-                        warningPlayer =
-                            MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
+                        warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
                         warningPlayer?.setOnCompletionListener { mp -> mp.release() }
                         warningPlayer?.start()
                         warningPlayed = true
                     }
-                },
-                onFinishCallback = {
+                }
+                override fun onFinish() {
+                    tiempoRestante = 0L
+                    timerText?.text = "00:00"
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
@@ -238,16 +249,14 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                         }
                     }
                     finishedPlayer?.start()
-                    // Desactiva el juego
                     gameActive = false
-                    // Deshabilita todos los botones
                     val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
                     buttonIds.forEach { id ->
                         view?.findViewById<Button>(id)?.isEnabled = false
                     }
                 }
-            )
-            gameTimer.start()
+            }
+            gameTimer?.start()
         }
         if (!isCountdownPaused) {
             countdownIndex = 0
@@ -293,6 +302,64 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             countdownRunnable?.let { countdownHandler?.postDelayed(it, 0) }
             isCountdownPaused = false
         }
+        // --- TEMPORIZADOR: solo reanuda con el tiempo restante ---
+        if (gameActive && tiempoRestante > 0) {
+            val timerText = view?.findViewById<TextView>(R.id.timer_text)
+            timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+            var warningPlayed = false
+            gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {
+                override fun onTick(millisUntilFinished: Long) {
+                    tiempoRestante = millisUntilFinished
+                    val minutes = (millisUntilFinished / 1000) / 60
+val seconds = (millisUntilFinished / 1000) % 60
+// Formato mm:ss
+val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+timerText?.text = timeFormatted
+                    val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
+                    if (secondsLeft <= 5) {
+                        timerText?.setTextColor(requireContext().getColor(R.color.rojo))
+                    } else {
+                        timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+                    }
+                    if (secondsLeft <= 5 && !warningPlayed) {
+                        warningPlayer?.release()
+                        warningPlayer = MediaPlayer.create(requireContext(), R.raw.se_va_a_acabar_el_tiempo)
+                        warningPlayer?.setOnCompletionListener { mp -> mp.release() }
+                        warningPlayer?.start()
+                        warningPlayed = true
+                    }
+                }
+                override fun onFinish() {
+                    tiempoRestante = 0L
+                    timerText?.text = "00:00"
+                    finishedPlayer?.release()
+                    finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
+                    finishedPlayer?.setOnCompletionListener { mp ->
+                        mp.release()
+                        if (!hasNavigated && isAdded && view != null) {
+                            hasNavigated = true
+                            try {
+                                val bundle = Bundle()
+                                bundle.putInt("score", score)
+                                findNavController().navigate(
+                                    R.id.action_gameFragment_to_resultFragment,
+                                    bundle
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                    finishedPlayer?.start()
+                    gameActive = false
+                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+                    buttonIds.forEach { id ->
+                        view?.findViewById<Button>(id)?.isEnabled = false
+                    }
+                }
+            }
+            gameTimer?.start()
+        }
     }
 
     override fun onPause() {
@@ -306,5 +373,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         }
         // Pausar el handler del texto
         countdownRunnable?.let { countdownHandler?.removeCallbacks(it) }
+        // --- TEMPORIZADOR: cancela y guarda tiempo restante ---
+        gameTimer?.cancel()
+        // tiempoRestante ya se actualiza en cada onTick
     }
 }
