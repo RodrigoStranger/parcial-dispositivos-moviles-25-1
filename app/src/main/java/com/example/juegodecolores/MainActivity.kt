@@ -6,7 +6,7 @@ package com.example.juegodecolores
     Curso: Programacion De Dispositivos Moviles
     Semestre: VI
     Fecha: 11/05/2025
-    Ultima modificacion: 11/05/2025 20:10 pm
+    Ultima modificacion: 11/05/2025 20:50 pm
 */
 
 /*

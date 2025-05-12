@@ -381,7 +381,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     setButtonsEnabled(false) // Deshabilito los botones
                 }
             }
-            gameTimer?.start()
+            gameTimer?.start() // Inicio el temporizador
         }
     }
 
