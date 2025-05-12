@@ -18,15 +18,15 @@ import androidx.navigation.fragment.findNavController
 // la puntuación y los sonidos. Toda la experiencia interactiva del usuario ocurre en este fragmento.
 class GameFragment : Fragment(R.layout.fragment_game) {
     private var hasNavigated = false // Evita doble navegación
-    private var countdownPlayer: MediaPlayer? = null
-    private var countdownPosition: Int = 0
-    private var countdownIndex: Int = 0
-    private var isCountdownPaused: Boolean = false
-    private var countdownHandler: Handler? = null
-    private var countdownRunnable: Runnable? = null
+    private var countdownPlayer: MediaPlayer? = null // Uso un MediaPlayer para reproducir el sonido de conteo
+    private var countdownPosition: Int = 0 // Uso esta variable para pausar el sonido de conteo
+    private var countdownIndex: Int = 0 // Uso esta variable para pausar el sonido de conteo
+    private var isCountdownPaused: Boolean = false // Uso esta variable para pausar el sonido de conteo
+    private var countdownHandler: Handler? = null // Handler para el conteo
+    private var countdownRunnable: Runnable? = null // Runnable para el conteo
     // Elimina  y usa la música centralizada en MainActivity
-    private var warningPlayer: MediaPlayer? = null
-    private var finishedPlayer: MediaPlayer? = null
+    private var warningPlayer: MediaPlayer? = null // Sonido de advertencia
+    private var finishedPlayer: MediaPlayer? = null // Sonido de fin
     // --- TEMPORIZADOR ---
     private var tiempoRestante: Long = 30_000L
     private var gameTimer: android.os.CountDownTimer? = null
@@ -46,10 +46,10 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         ColorOption("Negro", R.color.negro),
         ColorOption("Blanco", R.color.blanco)
     )
-    private var currentColors: List<ColorOption> = emptyList()
-    private var targetColor: ColorOption? = null
-    private var score = 0
-    private var gameActive = false
+    private var currentColors: List<ColorOption> = emptyList() // Colores disponibles
+    private var targetColor: ColorOption? = null // Color objetivo
+    private var score = 0 // Puntuación actual
+    private var gameActive = false // Flag para saber si el juego esta activo
 
     /**
      * Inicia una nueva ronda del juego: selecciono los colores, asigno los botones y
@@ -86,11 +86,11 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         // Asigno cada color a un botón y guardo el nombre como tag para comparar después.
         val buttons = getGameButtons()
         for (i in 0..3) {
-            val btn = buttons.getOrNull(i)
+            val btn = buttons.getOrNull(i) // Si no hay mas botones, no hago nada
             btn?.setBackgroundTintList(
                 android.content.res.ColorStateList.valueOf(
                     requireContext().getColor(
-                        currentColors[i].colorRes
+                        currentColors[i].colorRes // Uso el color correspondiente
                     )
                 )
             )
@@ -117,7 +117,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             imageView?.setImageResource(R.drawable.error) // Imagen de error
             MediaPlayer.create(requireContext(), R.raw.sonido_error) // Sonido de error
         }
-        imageView?.visibility = View.VISIBLE
+        imageView?.visibility = View.VISIBLE // Si no es nulo, muestro la imagen.
         mediaPlayer.setOnCompletionListener {
             imageView?.visibility = View.INVISIBLE
             mediaPlayer.release()
