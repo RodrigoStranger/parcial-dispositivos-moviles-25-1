@@ -88,14 +88,15 @@
 
     <TextView
         android:id="@+id/color_dynamic_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_width="260dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
         android:gravity="center"
         android:text="@string/color_name"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:layout_constraintHorizontal_bias="0.494"
+        android:textSize="34sp"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/color_name_text" />
