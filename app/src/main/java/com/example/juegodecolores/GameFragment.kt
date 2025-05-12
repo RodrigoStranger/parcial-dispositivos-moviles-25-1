@@ -202,22 +202,21 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             iniciarNuevaRonda()
             // Inicia el temporizador
             tiempoRestante = 30_000L
-            val timerText = view?.findViewById<TextView>(R.id.timer_text)
-            timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+            timerText.setTextColor(requireContext().getColor(R.color.blanco))
             var warningPlayed = false
             gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {
                 override fun onTick(millisUntilFinished: Long) {
                     tiempoRestante = millisUntilFinished
                     val minutes = (millisUntilFinished / 1000) / 60
-val seconds = (millisUntilFinished / 1000) % 60
-// Formato mm:ss
-val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-timerText?.text = timeFormatted
+                    val seconds = (millisUntilFinished / 1000) % 60
+                    // Formato mm:ss
+                    val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+                    timerText.text = timeFormatted
                     val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
                     if (secondsLeft <= 5) {
-                        timerText?.setTextColor(requireContext().getColor(R.color.rojo))
+                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
                     } else {
-                        timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
                     }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
@@ -229,7 +228,7 @@ timerText?.text = timeFormatted
                 }
                 override fun onFinish() {
                     tiempoRestante = 0L
-                    timerText?.text = "00:00"
+                    timerText.text = getString(R.string.timer_zero)
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
@@ -304,8 +303,8 @@ timerText?.text = timeFormatted
         }
         // --- TEMPORIZADOR: solo reanuda con el tiempo restante ---
         if (gameActive && tiempoRestante > 0) {
-            val timerText = view?.findViewById<TextView>(R.id.timer_text)
-            timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+            val timerText = view?.findViewById<TextView>(R.id.timer_text) ?: return
+            timerText.setTextColor(requireContext().getColor(R.color.blanco))
             var warningPlayed = false
             gameTimer = object : android.os.CountDownTimer(tiempoRestante, 50L) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -313,13 +312,13 @@ timerText?.text = timeFormatted
                     val minutes = (millisUntilFinished / 1000) / 60
 val seconds = (millisUntilFinished / 1000) % 60
 // Formato mm:ss
-val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-timerText?.text = timeFormatted
+val timeFormatted = String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds)
+timerText.text = timeFormatted
                     val secondsLeft = (millisUntilFinished / 1000).toInt() + if (millisUntilFinished % 1000 > 0) 1 else 0
                     if (secondsLeft <= 5) {
-                        timerText?.setTextColor(requireContext().getColor(R.color.rojo))
+                        timerText.setTextColor(requireContext().getColor(R.color.rojo))
                     } else {
-                        timerText?.setTextColor(requireContext().getColor(R.color.blanco))
+                        timerText.setTextColor(requireContext().getColor(R.color.blanco))
                     }
                     if (secondsLeft <= 5 && !warningPlayed) {
                         warningPlayer?.release()
@@ -331,7 +330,7 @@ timerText?.text = timeFormatted
                 }
                 override fun onFinish() {
                     tiempoRestante = 0L
-                    timerText?.text = "00:00"
+                    timerText.text = getString(R.string.timer_zero)
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
