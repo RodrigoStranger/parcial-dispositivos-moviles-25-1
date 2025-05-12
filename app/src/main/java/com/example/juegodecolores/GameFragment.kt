@@ -56,17 +56,37 @@ class GameFragment : Fragment(R.layout.fragment_game) {
      * muestro el color objetivo.
      */
 
+    // Devuelvo la lista de botones principales del juego
+    private fun getGameButtons(): List<Button> =
+        listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4).mapNotNull { view?.findViewById<Button>(it) }
+
+    // Cambio la visibilidad de todos los botones del juego
+    private fun setButtonsVisibility(visibility: Int) {
+        getGameButtons().forEach { it.visibility = visibility }
+    }
+
+    // Habilito o deshabilito todos los botones del juego
+    private fun setButtonsEnabled(enabled: Boolean) {
+        getGameButtons().forEach { it.isEnabled = enabled }
+    }
+
+    // Libero y limpio un MediaPlayer
+    private fun releaseMediaPlayer(player: MediaPlayer?): MediaPlayer? {
+        player?.setOnCompletionListener(null)
+        player?.release()
+        return null
+    }
+
     private fun iniciarNuevaRonda() {
         if (!gameActive) return
-        // Selecciona 4 colores distintos
         // Selecciono 4 colores aleatorios para esta ronda.
         currentColors = colorOptions.shuffled().take(4)
         // Elijo uno de esos colores como el objetivo a adivinar.
         targetColor = currentColors.random()
         // Asigno cada color a un botón y guardo el nombre como tag para comparar después.
-        val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
+        val buttons = getGameButtons()
         for (i in 0..3) {
-            val btn = view?.findViewById<Button>(buttonIds[i])
+            val btn = buttons.getOrNull(i)
             btn?.setBackgroundTintList(
                 android.content.res.ColorStateList.valueOf(
                     requireContext().getColor(
@@ -75,8 +95,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 )
             )
             btn?.tag = currentColors[i].name // Así sé qué color representa cada botón.
-            btn?.isEnabled = true // Habilito el botón para que el usuario pueda responder.
         }
+        setButtonsEnabled(true) // Habilito todos los botones para la nueva ronda.
         // Muestro el nombre del color objetivo que el usuario debe identificar.
         val colorNameText = view?.findViewById<TextView>(R.id.color_dynamic_text)
         colorNameText?.text = targetColor?.name
@@ -117,16 +137,9 @@ class GameFragment : Fragment(R.layout.fragment_game) {
 
         // Preparo la animación bounce para dar feedback visual en los botones.
         val bounce = AnimationUtils.loadAnimation(requireContext(), R.anim.boton_bounce)
-        val button1 = view.findViewById<Button>(R.id.button1)
-        val button2 = view.findViewById<Button>(R.id.button2)
-        val button3 = view.findViewById<Button>(R.id.button3)
-        val button4 = view.findViewById<Button>(R.id.button4)
 
         // Al iniciar el fragmento, oculto todos los elementos del juego para mostrarlos solo cuando corresponda.
-        button1.visibility = View.INVISIBLE
-        button2.visibility = View.INVISIBLE
-        button3.visibility = View.INVISIBLE
-        button4.visibility = View.INVISIBLE
+        setButtonsVisibility(View.INVISIBLE)
         // Oculto el texto "Adivina el color" y el texto dinámico.
         val colorNameText = view.findViewById<TextView>(R.id.color_name_text)
         colorNameText.visibility = View.INVISIBLE
@@ -137,8 +150,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
         val scoreText = view.findViewById<TextView>(R.id.score_text)
         scoreText.visibility = View.INVISIBLE
 
-        val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
-        val buttons = buttonIds.map { view.findViewById<Button>(it) }
+        val buttons = getGameButtons()
 
         // Para cada botón, asigno el listener que gestiona la lógica de selección de color.
         buttons.forEach { btn ->
@@ -146,7 +158,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                 v.startAnimation(bounce) // Feedback visual al pulsar
                 if (!gameActive) return@setOnClickListener // Ignoro si el juego no está activo
                 // Desactivo todos los botones para evitar múltiples respuestas en una ronda
-                buttons.forEach { it.isEnabled = false }
+                setButtonsEnabled(false)
                 val elegido = btn.tag as? String // Qué color eligió el usuario
                 val correcto = targetColor?.name // Cuál era el color correcto
                 if (elegido != null && correcto != null) {
@@ -202,14 +214,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
             countdownText.visibility = View.GONE
             timerText.visibility = View.VISIBLE
             // Muestra los botones ahora
-            val button1 = view?.findViewById<Button>(R.id.button1)
-            val button2 = view?.findViewById<Button>(R.id.button2)
-            val button3 = view?.findViewById<Button>(R.id.button3)
-            val button4 = view?.findViewById<Button>(R.id.button4)
-            button1?.visibility = View.VISIBLE
-            button2?.visibility = View.VISIBLE
-            button3?.visibility = View.VISIBLE
-            button4?.visibility = View.VISIBLE
+            setButtonsVisibility(View.VISIBLE)
             // Muestra el texto 'Adivina el color' ahora
             val colorNameText = view?.findViewById<TextView>(R.id.color_name_text)
             colorNameText?.visibility = View.VISIBLE
@@ -256,7 +261,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     finishedPlayer?.release()
                     finishedPlayer = MediaPlayer.create(requireContext(), R.raw.se_acabo_el_tiempo)
                     finishedPlayer?.setOnCompletionListener { mp ->
-                        mp.release()
+                        mp.release() // Libero el sonido de fin
                         if (!hasNavigated && isAdded && view != null) { // Si no se ha navegado y la vista sigue siendo visible
                             hasNavigated = true
                             try {
@@ -275,10 +280,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     }
                     finishedPlayer?.start() // Reproduzco el sonido de fin
                     gameActive = false // Marca que el juego no esta activo
-                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4) // Lista de botones
-                    buttonIds.forEach { id ->
-                        view?.findViewById<Button>(id)?.isEnabled = false // Deshabilito los botones
-                    }
+                    setButtonsEnabled(false) // Deshabilito los botones
                 }
             }
             gameTimer?.start() // Inicio el temporizador
@@ -309,11 +311,8 @@ class GameFragment : Fragment(R.layout.fragment_game) {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        warningPlayer?.release() // Libero el sonido de advertencia
-        warningPlayer = null // Limpio el MediaPlayer
-        finishedPlayer?.setOnCompletionListener(null)
-        finishedPlayer?.release() // Libero el sonido de fin
-        finishedPlayer = null // Limpio el MediaPlayer
+        warningPlayer = releaseMediaPlayer(warningPlayer) // Libero el sonido de advertencia
+        finishedPlayer = releaseMediaPlayer(finishedPlayer) // Libero el sonido de fin
         hasNavigated = false // Reinicia flag al destruir vista
     }
 
@@ -379,10 +378,7 @@ class GameFragment : Fragment(R.layout.fragment_game) {
                     } // Fin del temporizador
                     finishedPlayer?.start() // Reproduzco el sonido de fin
                     gameActive = false // Marca que el juego no esta activo
-                    val buttonIds = listOf(R.id.button1, R.id.button2, R.id.button3, R.id.button4)
-                    buttonIds.forEach { id ->
-                        view?.findViewById<Button>(id)?.isEnabled = false // Deshabilito los botones
-                    }
+                    setButtonsEnabled(false) // Deshabilito los botones
                 }
             }
             gameTimer?.start()
