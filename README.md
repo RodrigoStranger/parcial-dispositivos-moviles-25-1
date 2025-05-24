@@ -1,4 +1,4 @@
-# Programación Para Dispositivos Móviles - Examen Parcial
+# Programación Para Dispositivos Móviles - Kotlin - Examen Parcial
 
 📅 **Ciclo Académico**: 2025 - I  
 🎓 **Semestre**: VI  
